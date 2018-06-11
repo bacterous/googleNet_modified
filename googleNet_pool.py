@@ -4,10 +4,11 @@ from keras.models import Model
 from keras.regularizers import l2
 from keras.optimizers import SGD
 import sys
+import keras
 from inceptionModel import inception_model
 
 def define_model(weight_path = None):
-    input = Input(shape=(448, 448, 3))
+    input = Input(shape=(512, 512, 3))
 
     conv1_7x7_s2 = Conv2D(filters=64, kernel_size=(7, 7), strides=(2, 2), padding='same', activation='relu', kernel_regularizer=l2(0.01))(input)
 
@@ -41,10 +42,10 @@ def define_model(weight_path = None):
 
     inception_5b = inception_model(input=inception_5a, filters_1x1=384, filters_3x3_reduce=192, filters_3x3=384, filters_5x5_reduce=48, filters_5x5=128, filters_pool_proj=128)
 
-    averagepool1_7x7_s1 = AveragePooling2D(pool_size=(7, 7), strides=(7, 7), padding='same')(inception_5b)
-    averagepool1_2x2_s1 = AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='same')(averagepool1_7x7_s1)
+    maxpool5_3x3_s2 = MaxPooling2D(pool_size=(3, 3), strides=(2, 2), padding='same')(inception_5b)
+    averagepool1_8x8_s1 = AveragePooling2D(pool_size=(8, 8), strides=(8, 8), padding='same')(maxpool5_3x3_s2)
 
-    drop1 = Dropout(rate=0.4)(averagepool1_7x7_s1)
+    drop1 = Dropout(rate=0.4)(averagepool1_8x8_s1)
 
     linear = Dense(units=1, activation='sigmoid', kernel_regularizer=l2(0.01))(keras.layers.core.Flatten()(drop1))
     last = linear

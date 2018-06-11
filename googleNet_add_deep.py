@@ -9,7 +9,7 @@ import keras
 from inceptionModel import inception_model
 
 def define_model(weight_path = None):
-    input = Input(shape=(448, 448, 3))
+    input = Input(shape=(512, 512, 3))
 
     conv1_7x7_s2 = Conv2D(filters=64, kernel_size=(7, 7), strides=(2, 2), padding='same', activation='relu', kernel_regularizer=l2(0.01))(input)
 
@@ -49,8 +49,8 @@ def define_model(weight_path = None):
 
     inception_6b = inception_model(input=inception_6a, filters_1x1=512, filters_3x3_reduce=256, filters_3x3=512, filters_5x5_reduce=48, filters_5x5=192, filters_pool_proj=192)
 
-    averagepool1_7x7_s1 = AveragePooling2D(pool_size=(7, 7), strides=(7, 7), padding='same')(inception_6b)
-    drop1 = Dropout(rate=0.4)(averagepool1_7x7_s1)
+    averagepool1_8x8_s1 = AveragePooling2D(pool_size=(8, 8), strides=(8, 8), padding='same')(inception_6b)
+    drop1 = Dropout(rate=0.4)(averagepool1_8x8_s1)
     linear1 = Dense(units=1000, activation='relu', kernel_regularizer=l2(0.01))(Flatten()(drop1))
     linear2 = Dense(units=1, activation='sigmoid', kernel_regularizer=l2(0.01))(linear1)
     last = linear2
